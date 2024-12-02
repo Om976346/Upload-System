@@ -1,5 +1,6 @@
 import os
 import time
+import logging
 import requests
 from flask import Flask, request, render_template, jsonify, session
 from werkzeug.utils import secure_filename
@@ -8,43 +9,45 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Get the bot token and chat ID from .env file
+# Telegram bot credentials
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 CHAT_ID = os.getenv('CHAT_ID')
 
-# Allowed file types
+# Allowed file extensions
 ALLOWED_EXTENSIONS = {'pdf', 'txt', 'jpg', 'png', 'docx', 'zip', 'rar', 'mp3', 'mp4'}
 
-# Initialize Flask app
+# Flask app configuration
 app = Flask(__name__)
-app.secret_key = os.urandom(24)  # Used to store the uploaded filenames in session
+app.secret_key = os.urandom(24)
 
-# Function to check allowed file types
+# Logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Validate file extensions
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Ensure the file has a valid extension
-def ensure_extension(file):
+# Ensure file is valid and has a secure name
+def ensure_file(file):
     if not allowed_file(file.filename):
         raise ValueError("Invalid file type!")
-    file.filename = secure_filename(file.filename)  # Sanitize filename
+    file.filename = secure_filename(file.filename)
     return file
 
-# Route: Home (Upload Page)
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
-        # Handle multiple file uploads
         files = request.files.getlist("file")
         uploaded_files = []
 
         for file in files:
             try:
+                # Validate and secure the file
                 if file and allowed_file(file.filename):
-                    file = ensure_extension(file)
-                    
-                    # Send the file to Telegram without saving locally
-                    file.seek(0)
+                    file = ensure_file(file)
+
+                    # Upload to Telegram
+                    file.seek(0)  # Reset file pointer
                     url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendDocument'
                     payload = {'chat_id': CHAT_ID, 'caption': f"New file uploaded: {file.filename}"}
                     files_data = {'document': (file.filename, file.stream, file.mimetype)}
@@ -54,31 +57,34 @@ def home():
                     if response.status_code == 200:
                         uploaded_files.append(file.filename)
                     else:
-                        print(f"Error from Telegram API: {response.json()}")
-                        return jsonify({"error": f"Failed to send file {file.filename} to Telegram!"}), 500
+                        logging.error(f"Telegram API error for {file.filename}: {response.text}")
+                        return jsonify({"error": f"Failed to send file '{file.filename}' to Telegram. Response: {response.text}"}), 500
 
-                    time.sleep(1)  # Avoid Telegram API rate limits
+                    time.sleep(1)  # Prevent API rate limit issues
+
                 else:
-                    return jsonify({"error": "Invalid file type!"}), 400
+                    return jsonify({"error": f"Invalid file type: {file.filename}"}), 400
+
+            except ValueError as e:
+                logging.error(f"Validation error: {str(e)}")
+                return jsonify({"error": str(e)}), 400
 
             except requests.exceptions.RequestException as e:
-                return jsonify({"error": f"Error uploading {file.filename}: {str(e)}"}), 500
+                logging.error(f"Request error: {str(e)}")
+                return jsonify({"error": f"Failed to upload '{file.filename}': {str(e)}"}), 500
 
-        # Store the filenames in session for display
         if uploaded_files:
             if 'uploaded_files' not in session:
                 session['uploaded_files'] = []
             session['uploaded_files'].extend(uploaded_files)
 
-            return jsonify({"success": f"Files uploaded and sent to Telegram: {', '.join(uploaded_files)}"})
+            return jsonify({"success": f"Uploaded files: {', '.join(uploaded_files)}"})
 
-        return jsonify({"error": "No valid files uploaded!"}), 400
+        return jsonify({"error": "No valid files to upload."}), 400
 
-    # Render the HTML template
     uploaded_files = session.get('uploaded_files', [])
     return render_template("index.html", uploaded_files=uploaded_files)
 
-# Route: List Uploaded Files
 @app.route("/files", methods=["GET"])
 def list_files():
     uploaded_files = session.get('uploaded_files', [])

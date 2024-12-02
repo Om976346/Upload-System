@@ -55,7 +55,7 @@ def home():
 
     # Render the HTML template with the list of uploaded files
     uploaded_files = session.get('uploaded_files', [])
-    return render_template("index.html", uploaded_files=uploaded_files)
+    return render_templates("index.html", uploaded_files=uploaded_files)
 
 # Route: List Uploaded Files
 @app.route("/files", methods=["GET"])

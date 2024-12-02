@@ -19,7 +19,7 @@
     <div class="container">
         <!-- Drag and Drop Area -->
         <div class="upload-container" id="upload-container">
-            <p>Drag and drop files here, or click to select files Limit is 50 MB so please</p>
+            <p>Drag and drop files here, or click to select files (Limit: 50 MB)</p>
             <input type="file" id="file-input" name="file" multiple style="display:none;">
         </div>
 
@@ -28,13 +28,7 @@
 
         <!-- List of Uploaded Files -->
         <ul class="file-list" id="uploaded-files">
-            {% if uploaded_files %}
-                {% for file in uploaded_files %}
-                    <li>{{ file }}</li>
-                {% endfor %}
-            {% else %}
-                <li>No files uploaded yet.</li>
-            {% endif %}
+            <!-- Uploaded files will appear here -->
         </ul>
     </div>
 

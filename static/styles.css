@@ -31,7 +31,7 @@ footer {
 /* Container for the upload form and file list */
 .container {
     max-width: 800px;  /* Set a max-width for larger screens */
-    width: 100%;  /* Ensures it takes up the full width on smaller screens */
+    width: 95%;  /* Ensures it takes up the full width on smaller screens */
     margin: 30px auto;
     padding: 20px;
     background-color: white;

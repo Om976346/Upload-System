@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple File Upload</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <h1>Upload Multiple Files</h1>
+        <p>Drag and drop or select files to upload</p>
+    </header>
+
+    <!-- Main Content Section -->
+    <div class="container">
+        <!-- Drag and Drop Area -->
+        <div class="upload-container" id="upload-container">
+            <p>Drag and drop files here, or click to select files</p>
+            <input type="file" id="file-input" name="file" multiple style="display:none;">
+        </div>
+
+        <!-- Loader -->
+        <div class="loader" id="loader" style="display: none;"></div>
+
+        <!-- List of Uploaded Files -->
+        <ul class="file-list" id="uploaded-files">
+            {% if uploaded_files %}
+                {% for file in uploaded_files %}
+                    <li>{{ file }}</li>
+                {% endfor %}
+            {% else %}
+                <li>No files uploaded yet.</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 Your Company. All Rights Reserved.</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="/static/scripts.js"></script>
+</body>
+</html>

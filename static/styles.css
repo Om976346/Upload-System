@@ -1,0 +1,95 @@
+/* General styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+}
+
+footer {
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Container for the upload form and file list */
+.container {
+    width: 80%;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.upload-container {
+    width: 92%;
+    padding: 40px;
+    border: 2px dashed #007bff;
+    background-color: #e9f7fe;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.upload-container:hover {
+    background-color: #cce5ff;
+}
+
+.upload-container.dragover {
+    background-color: #b3d9ff;
+}
+
+.file-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.file-list li {
+    background-color: #f1f1f1;
+    padding: 12px;
+    margin: 6px 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Loader styles */
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+    display: block;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+}

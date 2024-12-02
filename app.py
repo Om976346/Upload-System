@@ -2,11 +2,12 @@ import os
 from flask import Flask, request, render_template, jsonify, session
 import requests
 from dotenv import load_dotenv
+import mimetypes
 
 # Load environment variables
 load_dotenv()
 
-# Get the bot token and chat ID from .env file
+# Get the bot token and chat ID from the .env file
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 CHAT_ID = os.getenv('CHAT_ID')
 
@@ -21,6 +22,13 @@ app.secret_key = os.urandom(24)  # Used to store the uploaded filenames in sessi
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Function to ensure the file has an extension
+def ensure_extension(file):
+    if '.' not in file.filename:
+        extension = mimetypes.guess_extension(file.mimetype)
+        file.filename += extension if extension else ''
+    return file
+
 # Route: Home (Upload Page)
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -28,14 +36,22 @@ def home():
         # Handle multiple file upload
         files = request.files.getlist("file")
         uploaded_files = []
-        
+
         for file in files:
             if file and allowed_file(file.filename):
+                # Ensure the file has an extension
+                file = ensure_extension(file)
+
                 # Send the file to Telegram without saving it locally
                 file.seek(0)  # Ensure the file pointer is at the start
                 url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendDocument'
-                payload = {'chat_id': CHAT_ID, 'caption': f"New file uploaded: {file.filename}"}
-                files_data = {'document': file}
+                payload = {
+                    'chat_id': CHAT_ID,
+                    'caption': f"New file uploaded: {file.filename}"
+                }
+                files_data = {
+                    'document': (file.filename, file.stream, file.mimetype)
+                }
                 response = requests.post(url, data=payload, files=files_data)
 
                 if response.status_code == 200:

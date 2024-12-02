@@ -92,4 +92,17 @@ footer {
     .container {
         width: 95%;
     }
+
+    header h1 {
+        font-size: 2em;
+    }
+
+    .upload-container {
+        padding: 30px;
+    }
+
+    .file-list li {
+        font-size: 14px;
+        padding: 10px;
+    }
 }
